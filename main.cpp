@@ -17,14 +17,39 @@ double generatePeople = GENERATE_PEOPLE;
 double countOfStarts =  COUNT_OF_STARTS;
 
 
+//TODO dočasné
+int count = 0;
+
+
 //Stores Boat, Pier
 Store Boat("Boat capacity", CAPACITY);
 Store Pier1("Pier-Podhori", 1);
 Store Pier2("Pier-Podbaba", 1);
 
-//Processes Boat, Human, Time
+//Processes Boat, Passager, Time
+
+class WorkTime : public Process{
+    void Behavior(){
+        printf("Call boat %f\n", Time);
+        DayTime->Activate;
+    }
+};
+
+
+
 class DayTime : public Process{
     void Behavior(){
+        for(int i = 0; i < countOfStarts; i++){
+            (new WorkTime)->Activate(Time+(15/60));
+            Passivate();
+            //call activate boat
+            printf("Call boat %f\n", Time);
+        }
+
+        Activate(Time+(7));
+        printf("Call boat %f\n", Time);
+
+        //call activate boat
     }
 };
 
@@ -35,9 +60,10 @@ class Boat : public Process{
     }
 };
 
-class Human : public Process{
+class Passager : public Process{
     void Behavior(){
-            printf("hello\n");
+            printf("%d. Passager (%f)\n", count++ , Time);
+
     }
 };
 
@@ -46,7 +72,7 @@ class Human : public Process{
 class GeneratorOfHumans : public Event {
 
     void Behavior(){
-        (new Human)->Activate();
+        (new Passager)->Activate();
         Activate(Time + Exponential(generatePeople));
     }
 };
@@ -70,6 +96,7 @@ int main() {
 
     //GENERATORS
 
+    (new DayTime)->Activate();
     (new GeneratorOfHumans)->Activate();
 
     //START SIMULATION
