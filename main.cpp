@@ -10,37 +10,43 @@
 using namespace std;
 
 //Default values of simulation
-#define COUNT_OF_STARTS 68
+#define COUNT_OF_STARTS 51
 
 #define GENERATE_PEOPLE 315 // 274 per day (17hours of work) | 1passager/315seconds
 
 #define CAPACITY 40
 
-#define RUNTIME hours(2500) // 182days
+#define RUNTIME hours(49) // 182days
 
 
 
 //Globals
 double generatePeople = GENERATE_PEOPLE;
 double countOfStarts =  COUNT_OF_STARTS;
-Entity *boat;
 
 //TODO dočasné
 int count1 = 0;
 int count2 = 0;
 
 
+
+Histogram Time_of_Passager1("Čas pasažéra(Podhoří-Podbaba) stráveného na cestě",0, minutes(1), 25);
+Histogram Time_of_Passager2("Čas pasažéra(Podbaba-Podhoří) stráveného na cestě",0, minutes(1), 25);
+
+
+Queue queue1("Fronta v Podhoří");
+Queue queue2("Fronta v Podbabě");
+Queue queueLoaded("Fronta v lodi na výstup");
+
 //Stores Boat_place, Pier
 Store Boat_place("Boat_place capacity", CAPACITY);
 Facility Pier1("Pier-Podhori");
 Facility Pier2("Pier-Podbaba");
-Facility Boat_time("Boat");
+bool Boat_time;
+
 
 //Processes Boat_place, Passager1, Time
 
-Queue queue1;
-Queue queue2;
-Queue queueLoaded;
 
 
 
@@ -49,7 +55,7 @@ class DayTime : public Process{
     void Behavior() {
         Seize(Pier1);
         Seize(Pier2);
-        Seize(Boat_time);
+        Boat_time = false;
 
         double timeBefore;
         double waitingTime1 = 0;
@@ -57,7 +63,7 @@ class DayTime : public Process{
         double uniform = 0;
         int days = 0;
         while(true){
-            Release(Boat_time);
+            Boat_time = true;
             printf("==========DAY: %d (%f)\n==========", days++, Time);
             for(int i = 0; i < countOfStarts; i++){
                 printf("-------(%d)Ready in Pier1-------\n",i);
@@ -70,18 +76,22 @@ class DayTime : public Process{
                     }
                 }
 
-                Wait(minutes(15)-waitingTime1-waitingTime2-uniform);
+                Wait(minutes(20)-waitingTime1-waitingTime2-uniform);
 
+                Boat_time = false;
                 timeBefore = Time;
                 Seize(Pier1);
                 waitingTime1 = Time - timeBefore;
+                Boat_time = true;
+
+
                 printf("BoatRide1 (%f)\n\n", Time);
                 uniform = Uniform(minutes(1),minutes(2));
                 Wait(uniform);
 
 
 
-                printf("-------Ready in Pier2-------\n");
+                printf("-------(%d)Ready in Pier2-------\n",i);
                 Release(Pier2);
                 if(!queueLoaded.Empty()){
                     (queueLoaded.GetFirst())->Activate();
@@ -93,9 +103,11 @@ class DayTime : public Process{
 
                 Wait(minutes(4)-waitingTime1-uniform);
 
+                Boat_time = false;
                 timeBefore = Time;
                 Seize(Pier2);
                 waitingTime2 = Time - timeBefore;
+                Boat_time = true;
 
                 printf("BoatRide2(back) (%f)\n\n", Time);
                 uniform = Uniform(minutes(1),minutes(2));
@@ -103,10 +115,10 @@ class DayTime : public Process{
                 waitingTime2 = minutes(4)+waitingTime2;
                 waitingTime1 = 0;
             }
-            printf("-------(Last-just uboard)Ready in Pier1-------\n");
+            printf("-------(Last-justUnboard)Ready in Pier1-------\n");
 
             Release(Pier1);
-            Seize(Boat_time);
+            Boat_time = false;
             if(!queueLoaded.Empty()){
                 (queueLoaded.GetFirst())->Activate();
             }
@@ -123,6 +135,7 @@ class DayTime : public Process{
 
 class Passager1 : public Process{
     void Behavior() {
+        double startOfPassager = Time;
         int id = count1;
         printf("%d. Passager1 (%f)\n", count1++, Time);
 
@@ -134,7 +147,7 @@ class Passager1 : public Process{
         }
 
         repeatBoard:
-        if(!Boat_place.Full() && !Pier1.Busy()) {
+        if(!Boat_place.Full() && !Pier1.Busy() && Boat_time) {
             Seize(Pier1);
         }else{
             printf("Passeger1(%d) going to queue1\n",id);
@@ -164,18 +177,18 @@ class Passager1 : public Process{
         if(!queueLoaded.Empty()){
             (queueLoaded.GetFirst())->Activate();
         } else{
-            if(!queue2.Empty() && !Boat_time.Busy()){
+            if(!queue2.Empty() && Boat_time){
                 queue2.GetFirst()->Activate();
             }
         }
 
-        //výstup
-        //Cesta
+        Time_of_Passager1(Time - startOfPassager);
     }
 };
 
 class Passager2 : public Process{
     void Behavior() {
+        double startOfPassager = Time;
         int id = count2;
         printf("%d. Passager2 (%f)\n", count2++, Time);
 
@@ -186,7 +199,7 @@ class Passager2 : public Process{
         }
 
         repeatBoard:
-        if(!Boat_place.Full() && !Pier2.Busy()) {
+        if(!Boat_place.Full() && !Pier2.Busy() && Boat_time) {
             Seize(Pier2);
         }else{
             printf("Passeger2(%d) going to queue2\n",id);
@@ -216,23 +229,32 @@ class Passager2 : public Process{
         if(!queueLoaded.Empty()){
             (queueLoaded.GetFirst())->Activate();
         } else {
-            if(!queue1.Empty() && !Boat_time.Busy()){
+            if(!queue1.Empty() && Boat_time){
                 queue1.GetFirst()->Activate();
             }
         }
 
+        Time_of_Passager2(Time - startOfPassager);
         //výstup
         //Cesta
     }
 };
 
-
-class GeneratorOfHumans : public Event {
+class GeneratorOfPassager1 : public Event {
 
     void Behavior(){
-        (new Passager1)->Activate();
+        if(Boat_time)
+            (new Passager1)->Activate();
         Activate(Time + Exponential(generatePeople));
-        (new Passager2)->Activate();
+    }
+};
+
+
+class GeneratorOfPassager2 : public Event {
+
+    void Behavior(){
+        if(Boat_time)
+            (new Passager2)->Activate();
         Activate(Time + Exponential(generatePeople));
     }
 };
@@ -257,12 +279,20 @@ int main() {
     //GENERATORS
 
     (new DayTime)->Activate();
-    (new GeneratorOfHumans)->Activate();
+    (new GeneratorOfPassager1)->Activate();
+    (new GeneratorOfPassager2)->Activate();
 
     //START SIMULATION
     Run();
 
     //OUTPUTS
+    queue1.Output();
+    queue2.Output();
+    queueLoaded.Output();
+
+    Time_of_Passager1.Output();
+    Time_of_Passager2.Output();
+
 
 
     return 0;
