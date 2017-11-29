@@ -1,15 +1,23 @@
 #include <iostream>
 #include <simlib.h>
 
+//Macros
+#define seconds(x) (x)
+#define minutes(x) ((x)*60)
+#define hours(x) (minutes((x)*60))
+#define days(x) (hours((x)*24))
+
+using namespace std;
 
 //Default values of simulation
 #define COUNT_OF_STARTS 68
 
-#define GENERATE_PEOPLE 0.087591241 // 274 per day (17hours of work) | 11,4166666 per hour | 1human/0,087591241hours
+#define GENERATE_PEOPLE 315 // 274 per day (17hours of work) | 1passager/315seconds
 
 #define CAPACITY 40
 
-#define RUNTIME 40  //hours
+#define RUNTIME hours(2500) // 182days
+
 
 
 //Globals
@@ -26,7 +34,7 @@ int count2 = 0;
 Store Boat_place("Boat_place capacity", CAPACITY);
 Facility Pier1("Pier-Podhori");
 Facility Pier2("Pier-Podbaba");
-Facility Boat("Boat");
+Facility Boat_time("Boat");
 
 //Processes Boat_place, Passager1, Time
 
@@ -35,70 +43,82 @@ Queue queue2;
 Queue queueLoaded;
 
 
-class BoatRide : public Process{
-    void Behavior(){
-        Wait(Uniform(0.016666667,0.033333333));
-    }
-};
 
 class DayTime : public Process{
 
     void Behavior() {
         Seize(Pier1);
         Seize(Pier2);
+        Seize(Boat_time);
+
         double timeBefore;
-        double waitingTime;
+        double waitingTime1 = 0;
+        double waitingTime2 = 0;
+        double uniform = 0;
+        int days = 0;
         while(true){
+            Release(Boat_time);
+            printf("==========DAY: %d (%f)\n==========", days++, Time);
             for(int i = 0; i < countOfStarts; i++){
-                printf("-------Ready in Pier1-------\n");
+                printf("-------(%d)Ready in Pier1-------\n",i);
                 Release(Pier1);
                 if(!queueLoaded.Empty()){
                     (queueLoaded.GetFirst())->Activate();
+                }else{
+                    if(!queue1.Empty()){
+                        queue1.GetFirst()->Activate();
+                    }
                 }
-                timeBefore = Time;
-                WaitUntil(Boat_place.Empty());
-                waitingTime = Time - timeBefore;
 
-                if(!queue1.Empty()){
-                    queue1.GetFirst()->Activate();
-                }
-                Wait(0.25-waitingTime);
+                Wait(minutes(15)-waitingTime1-waitingTime2-uniform);
+
+                timeBefore = Time;
                 Seize(Pier1);
+                waitingTime1 = Time - timeBefore;
                 printf("BoatRide1 (%f)\n\n", Time);
-                (new BoatRide)->Activate();
+                uniform = Uniform(minutes(1),minutes(2));
+                Wait(uniform);
+
+
+
                 printf("-------Ready in Pier2-------\n");
                 Release(Pier2);
                 if(!queueLoaded.Empty()){
                     (queueLoaded.GetFirst())->Activate();
+                }else{
+                    if(!queue2.Empty()){
+                        queue2.GetFirst()->Activate();
+                    }
                 }
+
+                Wait(minutes(4)-waitingTime1-uniform);
+
                 timeBefore = Time;
-                WaitUntil(Boat_place.Empty());
-                waitingTime = Time - timeBefore;
-
-                if(!queue2.Empty()){
-                    queue2.GetFirst()->Activate();
-                }
-
-                Wait(0.066666667-waitingTime);
                 Seize(Pier2);
-                printf("BoatRide2(back) (%f)\n\n", Time);
-                (new BoatRide)->Activate();
+                waitingTime2 = Time - timeBefore;
 
+                printf("BoatRide2(back) (%f)\n\n", Time);
+                uniform = Uniform(minutes(1),minutes(2));
+                Wait(uniform);
+                waitingTime2 = minutes(4)+waitingTime2;
+                waitingTime1 = 0;
             }
-            printf("-------Ready in Pier1-------\n");
+            printf("-------(Last-just uboard)Ready in Pier1-------\n");
+
             Release(Pier1);
+            Seize(Boat_time);
             if(!queueLoaded.Empty()){
                 (queueLoaded.GetFirst())->Activate();
             }
-            timeBefore = Time;
-            WaitUntil(Boat_place.Empty());
-            waitingTime = Time - timeBefore;
+            Wait(hours(7)-waitingTime2-uniform); //problem s nevystupovaním
             Seize(Pier1);
-            Wait(7-waitingTime);
+
+            waitingTime2 = 0;
+            waitingTime1 = 0;
+            uniform = 0;
         }
     }
 };
-
 
 
 class Passager1 : public Process{
@@ -122,7 +142,7 @@ class Passager1 : public Process{
             Passivate();
             goto repeatBoard;
         }
-        double uniform = Uniform(0.000277778,0.000833333);
+        double uniform = Uniform(seconds(1),seconds(3));//1-3s
         Wait(uniform);
         Enter(Boat_place);
         printf("Board passager1(%d) in Pier1 (%f)\n",id ,Time+uniform);
@@ -136,13 +156,17 @@ class Passager1 : public Process{
         Passivate();
 
         Seize(Pier2);
-        uniform = Uniform(0.000277778,0.000833333);
+        uniform = Uniform(seconds(1),seconds(3));//1-3s
         Wait(uniform);
         Leave(Boat_place);
         printf("Unboard1 passager1(%d) in time (%f)\n", id , Time + uniform);
         Release(Pier2);
         if(!queueLoaded.Empty()){
             (queueLoaded.GetFirst())->Activate();
+        } else{
+            if(!queue2.Empty() && !Boat_time.Busy()){
+                queue2.GetFirst()->Activate();
+            }
         }
 
         //výstup
@@ -170,7 +194,7 @@ class Passager2 : public Process{
             Passivate();
             goto repeatBoard;
         }
-        double uniform = Uniform(0.000277778,0.000833333);
+        double uniform = Uniform(seconds(1),seconds(3)); //1-3s
         Wait(uniform);
         Enter(Boat_place);
         printf("Board passager2(%d) in Pier2 (%f)\n", id, Time + uniform);
@@ -184,13 +208,17 @@ class Passager2 : public Process{
         Passivate();
 
         Seize(Pier1);
-        uniform = Uniform(0.000277778,0.000833333);
+        uniform = Uniform(seconds(1),seconds(3));//1-3s
         Wait(uniform);
         Leave(Boat_place);
         printf("Unboard2 passager2(%d) in time (%f)\n", id, Time+uniform);
         Release(Pier1);
         if(!queueLoaded.Empty()){
             (queueLoaded.GetFirst())->Activate();
+        } else {
+            if(!queue1.Empty() && !Boat_time.Busy()){
+                queue1.GetFirst()->Activate();
+            }
         }
 
         //výstup
