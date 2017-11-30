@@ -1,5 +1,6 @@
 #include <iostream>
 #include <simlib.h>
+#include <getopt.h>
 
 //Macros
 #define seconds(x) (x)
@@ -260,13 +261,46 @@ class GeneratorOfPassager2 : public Event {
 };
 
 
-int main() {
+
+void printHelp(){
+    printf("This Is Help!\n");
+    exit(EXIT_SUCCESS);
+}
+
+int main(int argc, char *argv[]) {
     unsigned long capacity = CAPACITY;
+    unsigned long runtime = RUNTIME;
     //global variable
     generatePeople = GENERATE_PEOPLE;
     countOfStarts = COUNT_OF_STARTS;
 
+
     //TODO parse aguments
+    int c;
+    while ((c = getopt (argc, argv, "ht:c:s:p:")) != -1 ) {
+        switch (c) {
+            case 'h':
+                printHelp();
+                break;
+            case 't':
+                runtime = strtoul(optarg, NULL, 0);
+                break;
+            case 'c':
+                capacity = strtoul(optarg, NULL, 0);
+                break;
+            case 's':
+                countOfStarts = strtoul(optarg, NULL, 0);
+                break;
+            case 'p':
+                generatePeople = strtoul(optarg, NULL, 0);
+            case '?':
+                printf("Unknown argument: %s of %c\n", optarg, c);
+                exit(EXIT_FAILURE);
+            default:
+                break;
+        }
+    }
+
 
     Boat_place.SetCapacity(capacity);
 
@@ -274,7 +308,7 @@ int main() {
     SetOutput("ims_output.out");
 
     //INITIALIZATION OF SIMULATION
-    Init(0, RUNTIME);
+    Init(0, runtime);
 
     //GENERATORS
 
@@ -292,6 +326,9 @@ int main() {
 
     Time_of_Passager1.Output();
     Time_of_Passager2.Output();
+
+    Pier1.Output();
+    Pier2.Output();
 
 
 
