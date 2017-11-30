@@ -1,0 +1,137 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[czech]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{epstopdf}
+\usepackage{svg}
+\definecolor{lightgray}{rgb}{.9,.9,.9}
+\definecolor{darkgray}{rgb}{.4,.4,.4}
+\definecolor{purple}{rgb}{0.65, 0.12, 0.82}
+\usepackage{url}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\bibliographystyle{documentation}
+\usepackage[left=2cm,right=2cm,top=2.5cm,bottom=2cm]{geometry}
+\author{Tomáš Kohout}
+\begin{document}
+
+
+
+\lstdefinelanguage{code}{
+  keywords={},
+  keywordstyle=\color{blue}\bfseries,
+  ndkeywords={},
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
+}
+
+\lstset{
+   language=code,
+   backgroundcolor=\color{lightgray},
+   extendedchars=true,
+   basicstyle=\footnotesize\ttfamily,
+   showstringspaces=false,
+   showspaces=false,
+   numbers=left,
+   numberstyle=\footnotesize,
+   numbersep=9pt,
+   tabsize=2,
+   breaklines=true,
+   showtabs=false,
+   captionpos=b
+}
+
+\DeclareGraphicsExtensions{.pdf,.png,.jpg}
+
+\newcommand{\slideRef}[1]{\textit{(IMS slide #1)}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+	\begin{titlepage}
+
+		\begin{center}
+
+			\textsc{
+				\Huge
+					Vysoké učení technické v~Brně\\
+				\huge
+					Fakulta informačních technologií
+			}\\
+
+			\vspace{\stretch{0.320}}
+
+			\LARGE
+					IMS - Modelování a simulace\\
+					4. Doprava zboží nebo osob\\~\\
+			\Huge{}
+					Dokumentace
+			\vspace{\stretch{0.650}}
+
+		\end{center}
+
+		{\Large
+			29. listopadu 2017
+			\hfill
+			Tomáš Blažek, Tomáš Kohout
+		}
+
+	\end{titlepage}
+
+	\tableofcontents
+
+	\pagebreak
+
+
+	\section{Úvod a motivaci}
+		Tato práce si klade za cíl zjistit, zda dosavadní frekvence převážení cestujících přívozem na trase Podbaba-Podhoří je v
+    souladu s množstvím přepravovaných osob nebo zda je možné tuto frekvenci snížit. Na základě vytvořeného modelu
+    budou provedeny experimenty s různými časovými úseky a různým množstvím cestujících.
+
+    Tato práce si klade za cíl zjistit, zda je dosavadní frekvence převážení cestujících přívozem na trase Podbaba-Podhoří
+    v souladu s množstvím převážených cestujících. Pro tento účel byl vytvořen model (\cite{SLAJD}, 7. slide)
+
+		\subsection{Konzultace a zdroje}
+			Autory projektu jsou Tomáš Blažek a Tomáš Kohout. Pro vytvoření projektu jsou použity veřejně dostupné informace ze stránek Dopravního podnku hl. m. Prahy, především pak jízdní řád a informace o celkovém počtu přepravených osob. Abstraktní model je vytvořen na základě jizdního řádu a pozorování .
+
+		\subsection{Ověřování validity modelu}
+    Model byl ověřován experimenty prováděné pomocí modelu. Získané výsledky byly následně porovná-
+    vány s reálnými údaji získanými na základě pozorování obsluhy pasažérů \cite{DELKA_CESTY} a také pomocí získaných dat. \cite{ROCENKY}
+
+
+	\section{Rozbor tématu a použitých metod/technologií}
+  Pro modelování a následnou simulaci přívozu je nezbytné znát jeho reálné chování.
+  Přívoz z Podbaby do Podhoří se zabývá výlučně přepravou cestujících z jednoho
+  břehu na druhý. Tuto informaci jsme získali pozorováním z následujícího videa \cite{DELKA_CESTY}.
+  Z toho samého snímku je patrná i doba cesty, která je v tomto konkrétním případě 1 minuta a 28 sekundy
+  Na stejném videu jsme také vypozorovali průměrnou dobu vystupování. Ta se pohybuje
+  okolo 5 sekund v případě staršího typu lodě, který je vidět na videu. V současné době je ovšem používána loď zakoupená
+  v roce 2016 \cite{LOD}, která má palubu v rovině s molem a vyšší kapacitu. Kapacita se z původních 12 míst zvýšila na
+  40. Dále bylo třeba zjistit celkový počet jízd přívozu za jeden pracovní den. Tuto informaci
+  jsme zjistili z jízdního řádu \cite{PID}, který je platný od 11.12.2016.
+  V ročenkách Technické správy komunikací hl. m. Prahy jsme získali data potřebná pro
+  správné generování cestujících \cite{ROCENKY}. Tato hodnota se pohybuje v rozsahu od 190 000
+  až po 350 000 převezených cestujících ročně.
+
+  \subsection{Použíté postupy pro vytváření modelu}
+  Pro vytvoření byl použitý jazyk C++, neboť v tomto jazyku ja napsaná knihovna SIMLIB \cite{SIMLIB},
+  která je vhodná pro simulaci daného zadání. V modelu jsou použity algoritmy použité
+  128  - 206
+
+
+	\section{Závěr}
+
+	\section{Zdroje}
+		\bibliography{documentation}
+
+
+\end{document}
