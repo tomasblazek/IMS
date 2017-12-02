@@ -8,49 +8,14 @@
 \usepackage{color}
 \usepackage{epstopdf}
 \usepackage{svg}
-\definecolor{lightgray}{rgb}{.9,.9,.9}
-\definecolor{darkgray}{rgb}{.4,.4,.4}
-\definecolor{purple}{rgb}{0.65, 0.12, 0.82}
 \usepackage{url}
 \usepackage{amssymb}
 \usepackage{graphicx}
 \bibliographystyle{documentation}
 \usepackage[left=2cm,right=2cm,top=2.5cm,bottom=2cm]{geometry}
-\author{Tomáš Kohout}
+\author{Tomáš Kohout, Tomáš Blažek}
 \begin{document}
 
-
-
-\lstdefinelanguage{code}{
-  keywords={},
-  keywordstyle=\color{blue}\bfseries,
-  ndkeywords={},
-  ndkeywordstyle=\color{darkgray}\bfseries,
-  identifierstyle=\color{black},
-  sensitive=false,
-  comment=[l]{//},
-  morecomment=[s]{/*}{*/},
-  commentstyle=\color{purple}\ttfamily,
-  stringstyle=\color{red}\ttfamily,
-  morestring=[b]',
-  morestring=[b]"
-}
-
-\lstset{
-   language=code,
-   backgroundcolor=\color{lightgray},
-   extendedchars=true,
-   basicstyle=\footnotesize\ttfamily,
-   showstringspaces=false,
-   showspaces=false,
-   numbers=left,
-   numberstyle=\footnotesize,
-   numbersep=9pt,
-   tabsize=2,
-   breaklines=true,
-   showtabs=false,
-   captionpos=b
-}
 
 \DeclareGraphicsExtensions{.pdf,.png,.jpg}
 
@@ -93,20 +58,19 @@
 
 
 	\section{Úvod a motivaci}
-		Tato práce si klade za cíl zjistit, zda dosavadní frekvence převážení cestujících přívozem na trase Podbaba-Podhoří je v
-    souladu s množstvím přepravovaných osob nebo zda je možné tuto frekvenci snížit. Na základě vytvořeného modelu
-    budou provedeny experimenty s různými časovými úseky a různým množstvím cestujících.
+	Tato práce si klade za cíl zjistit, zda dosavadní frekvence převážení cestujících přívozem na trase Podbaba-Podhoří je v
+  souladu s množstvím přepravovaných osob nebo zda je možné tuto frekvenci snížit. Na základě vytvořeného modelu
+  budou provedeny experimenty s různými časovými úseky a různým množstvím cestujících.
 
-    Tato práce si klade za cíl zjistit, zda je dosavadní frekvence převážení cestujících přívozem na trase Podbaba-Podhoří
-    v souladu s množstvím převážených cestujících. Pro tento účel byl vytvořen model (\cite{SLAJD}, 7. slide)
+  Tato práce si klade za cíl zjistit, zda je dosavadní frekvence převážení cestujících přívozem na trase Podbaba-Podhoří
+  v souladu s množstvím převážených cestujících. Pro tento účel byl vytvořen model (\cite{SLAJD}, 7. slide)
 
-		\subsection{Konzultace a zdroje}
-			Autory projektu jsou Tomáš Blažek a Tomáš Kohout. Pro vytvoření projektu jsou použity veřejně dostupné informace ze stránek Dopravního podnku hl. m. Prahy, především pak jízdní řád a informace o celkovém počtu přepravených osob. Abstraktní model je vytvořen na základě jizdního řádu a pozorování .
+	\subsection{Konzultace a zdroje}
+	Autory projektu jsou Tomáš Blažek a Tomáš Kohout. Pro vytvoření projektu jsou použity veřejně dostupné informace ze stránek Dopravního podnku hl. m. Prahy, především pak jízdní řád a informace o celkovém počtu přepravených osob. Abstraktní model je vytvořen na základě jizdního řádu a pozorování .
 
-		\subsection{Ověřování validity modelu}
-    Model byl ověřován experimenty prováděné pomocí modelu. Získané výsledky byly následně porovná-
-    vány s reálnými údaji získanými na základě pozorování obsluhy pasažérů \cite{DELKA_CESTY} a také pomocí získaných dat. \cite{ROCENKY}
-
+	\subsection{Ověřování validity modelu}
+  Model byl ověřován experimenty prováděné pomocí modelu. Získané výsledky byly následně porovná-
+  vány s reálnými údaji získanými na základě pozorování obsluhy pasažérů \cite{DELKA_CESTY} a také pomocí získaných dat. \cite{ROCENKY}
 
 	\section{Rozbor tématu a použitých metod/technologií}
   Pro modelování a následnou simulaci přívozu je nezbytné znát jeho reálné chování.
@@ -116,16 +80,48 @@
   Na stejném videu jsme také vypozorovali průměrnou dobu vystupování. Ta se pohybuje
   okolo 5 sekund v případě staršího typu lodě, který je vidět na videu. V současné době je ovšem používána loď zakoupená
   v roce 2016 \cite{LOD}, která má palubu v rovině s molem a vyšší kapacitu. Kapacita se z původních 12 míst zvýšila na
-  40. Dále bylo třeba zjistit celkový počet jízd přívozu za jeden pracovní den. Tuto informaci
+  40. Dále bylo nutné zjistit celkový počet jízd přívozu za jeden pracovní den. Tuto informaci
   jsme zjistili z jízdního řádu \cite{PID}, který je platný od 11.12.2016.
   V ročenkách Technické správy komunikací hl. m. Prahy jsme získali data potřebná pro
   správné generování cestujících \cite{ROCENKY}. Tato hodnota se pohybuje v rozsahu od 190 000
-  až po 350 000 převezených cestujících ročně.
+  až po 350 000 převezených cestujících ročně. Předpokládáme, že v letním období je
+  zájem o přepravu přívozem větší než v zimě. Nejsou však k dispozici žádné informace o
+  počtu převezených pasažérů v letním období, budeme tedy uvažovat, že v letním období
+  převeze přívoz denně přibližně 2 - 3 krát více osob než v zimnímm období.
 
   \subsection{Použíté postupy pro vytváření modelu}
-  Pro vytvoření byl použitý jazyk C++, neboť v tomto jazyku ja napsaná knihovna SIMLIB \cite{SIMLIB},
-  která je vhodná pro simulaci daného zadání. V modelu jsou použity algoritmy použité
-  128  - 206
+  Postup se skládá z několika kroků. Nejprve bylo nutné dekomponovat úlohu na jednotlivé procesy,
+  které se v ní odehrávají. Petriho síť(TODO odkaz), byla vhodným kandidátem pro grafické znázornění
+  jednotlých procesů, ze které se dále vycházelo při tvorbě simulačního modelu.
+
+  \subsection{Původu použitých metod/technologií}
+  Pro vytvoření simulačního modelu byl použitý jazyk C++, neboť v tomto jazyce je napsaná knihovna SIMLIB \cite{SIMLIB},
+  která je vhodná pro vytvoření simulačního modelu daného problému, protože obsahuje funkce, které vystihují
+  chování systému hromadné obsluhy. V modelu jsou použity algoritmy využívané v příkladech na democvičení (TODO).
+
+  \section{Koncepce modelu}
+  Smyslem tohoto projektu je simulovat (\cite{SLAJD}, slide 8) provoz přívozu Pražské integrované dopravy
+  z Podbaby do Podhoří v určitém časovém intervalu a sledovat zahlcenost nebo nezahlcenost kapacity přívozu,
+  popřípadě délku front na obou březích a vytvořit tak ideální frekvenci jízd.
+
+  Zanedbali jsme povodňové stavy a různé poruchy, protože pro simulaci (\cite{SLAJD}, slide 8)
+  jsou marginální. Přívoz při prvním povodňovém stupni nevyjíždí a poruchy různého druhu se
+  můžou vyskytnout, ale pro zjištění frekvence jízd nejsou podstatné.
+
+  \subsection{Návrh konceptuálního modelu}
+  Přívoz má dvě mola. Ke každému molu přicházejí cestující s exponenciálním rozložením (\cite{SLAJD}, slide 91).
+  Tito cestující čekají na uvolnění mola. Je-li molo k dispozici, není vyčerpána kapacita lodě a nenastal čas odjezdu
+  nastupují po jednom pasažérovi do lodě. Nastupování samo o sobě zabere určitý čas. Pokud nastane čas odjezdu, tak právě
+  nastupující cestující dokončí svou činnost a loď vypluje na cestu. Po určité době dojede k druhému molu, kde nejprve vystoupí naložení cestující.
+  Následně mohou nastupovat čekající cestující. Nastupování probíhá totožně jako na prvním molu.
+  Po uplynutí určité doby a dokončeném nastupování pasažéra, který nastupoval v době odjezdu odjede loď zpět k
+  prvnímu molu, kde opět vyloží naložené cestující a celý proces se opakuje. Doba čekání na druhém břehu musí být
+  dostatečná pro vystoupení a nastoupení plně obsazené lodě.
+
+  \subsection{Forma konceptuálního modelu}
+
+  Pro popis abstraktního modelu (\cite{SLAJD}, slide 40-43) byla vytvořena Petriho síť (\cite{SLAJD}, slide 123-142),
+  ze získaných informací uvedených dříve v textu.
 
 
 	\section{Závěr}
