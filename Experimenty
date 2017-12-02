@@ -1,0 +1,45 @@
+rok 2016
+196 342 osob za rok 
+pruměrně = 538 lidí za den , za hodinu 31,6425
+generování exp((1/31,6425)*60*60) = 1 člověk za 114 sekund
+Sezóna(3 víc lidí než je roční průměr) = 538 * 3 = 1614, za hodinu 95 lidi
+generování exp((1/95)*60*60) = 1 člověk za 38 sekund pro každy břeh 76
+Mimosezonu(doplněk = 196 342 - 146874 = 49468)
+průměrně = 180 lidí za den (pracovní doba), za hodinu 10,62
+generování exp((1/10,62)*60*60) = 1 člověk za 339 sekund , pro každy břeh 678
+
+
+
+rok 2011
+323 240 osob za rok
+pruměrně = 886 lidi za den , za hodin 36,9
+generování exp ((1/36,9)*60*60) = 1 člověk za 148 sekund
+Sezóna(3 víc lidí než je roční průměr) = 886 * 3 = 2658, za hodinu 156 lidi
+generování exp((1/156)*60*60) = 1 člověk za 23 sekund pro každy břeh 46
+Mimosezonu(doplněk = 323 240 - 241878 = 81362)
+průměrně = 180 lidí za den (pracovní doba), za hodinu 10,62
+generování exp((1/10,62)*60*60) = 1 člověk za 339 sekund , pro každy břeh 678
+
+
+INFO k experimentům
+1
+./ims -t 91 -p 76 -f Experiment1-Season.out 
+
+
+2
+./ims -t 274 -p 678 -f Experiment2-Offseason.out 
+
+
+3
+./ims -t 91 -p 76 -f Experiment3-Season\ 25minutes\ runs.out -s 41
+
+Interval mezi cestami přibližně 25minut
+
+
+4
+./ims -t 274 -p 678 -f Experiment4-Offseason\ 60minutes\ runs.out -s 17
+
+
+5
+./ims -t 274 -p 46 -f Experiment5-Season2011\ Max\ usage.out
+
