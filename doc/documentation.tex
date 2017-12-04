@@ -70,7 +70,7 @@
 
 	\subsection{Ověřování validity modelu}
   Model byl ověřován experimenty prováděné pomocí modelu. Získané výsledky byly následně porovná-
-  vány s reálnými údaji získanými na základě pozorování obsluhy pasažérů \cite{DELKA_CESTY} a také pomocí získaných dat. \cite{ROCENKY}
+  vány s reálnými údaji získanými na základě pozorování obsluhy pasažérů \cite{DELKA_CESTY} a také pomocí získaných dat \cite{ROCENKY}. 
 
 	\section{Rozbor tématu a použitých metod/technologií}
   Pro modelování a následnou simulaci přívozu je nezbytné znát jeho reálné chování.
@@ -91,13 +91,13 @@
 
   \subsection{Použíté postupy pro vytváření modelu}
   Postup se skládá z několika kroků. Nejprve bylo nutné dekomponovat úlohu na jednotlivé procesy,
-  které se v ní odehrávají. Petriho síť(TODO odkaz), byla vhodným kandidátem pro grafické znázornění
+  které se v ní odehrávají. Petriho síť(\cite{SLAJD}, slide 123-142), byla vhodným kandidátem pro grafické znázornění
   jednotlých procesů, ze které se dále vycházelo při tvorbě simulačního modelu.
 
   \subsection{Původu použitých metod/technologií}
   Pro vytvoření simulačního modelu byl použitý jazyk C++, neboť v tomto jazyce je napsaná knihovna SIMLIB \cite{SIMLIB},
   která je vhodná pro vytvoření simulačního modelu daného problému, protože obsahuje funkce, které vystihují
-  chování systému hromadné obsluhy. V modelu jsou použity algoritmy využívané v příkladech na democvičení (TODO).
+  chování systému hromadné obsluhy. V modelu jsou použity algoritmy využívané v příkladech na democvičení \cite{DEMOCVIKO}.
 
   \section{Koncepce modelu}
   Smyslem tohoto projektu je simulovat (\cite{SLAJD}, slide 8) provoz přívozu Pražské integrované dopravy
@@ -121,11 +121,92 @@
   \subsection{Forma konceptuálního modelu}
 
   Pro popis abstraktního modelu (\cite{SLAJD}, slide 40-43) byla vytvořena Petriho síť (\cite{SLAJD}, slide 123-142),
-  ze získaných informací uvedených dříve v textu.
+  ze získaných informací uvedených dříve v textu. Tato síť je hierarchicky popsána na obrázcích \ref{pnTime}, \ref{pnWork} a \ref{pnWork2}.
+
+	\begin{figure}[h]
+		\centering
+		\includegraphics[scale=0.7]{pn-daytime.pdf}
+		\caption{Petriho síť znázorňující režim odjezdů}
+		\label{pnTime}
+	\end{figure}
+
+	Na obrázku \ref{pnTime} vidíme, že v původním jízdní řádu je počet jízd udán číslem 68 a
+	poté následuje 7 hodin pauza. Modré šipky indikují začátek generování nových pasažérů.
+	Zelené šipky indikují ukončení generování pasažérů přes noc. Do zlata zbarevé stavy
+	slouží k vyprázdnění fronty čekajících pasažérů na odvoz, aby nečekali přes noc.
+	Červená šipka uvolní molo Podhoří a umožní cestujícím nastupovat. Do červena zbarvený
+	stav určuje, že po nastoupení posledního pasažéra se vydají naložení pasažéři na cestu.
+
+	\begin{figure}[h]
+		\centering
+		\includegraphics[scale=0.7]{pn-work.pdf}
+		\caption{Petriho síť znázorňující nástup/výstup pasažérů a cestu ke druhému molu}
+		\label{pnWork}
+	\end{figure}
+
+	\newpage
+	Na obrázku \ref{pnWork} je znázorněno nastupování a vystupování cestujících. Pokud nastane čas
+	odjezdu, tak se loď vydá na cestu a pluje ke druhému molu. Z obrázku je zřejmé, že vždy dojde
+	nejprve k vystoupení cestujících a až posléze k nastoupení nových pasažérů, přičemž k odejzdu
+	dojde až poté, co nastoupí poslední cestující. Celý abstraktní model používá pouze jednu kapacitu lodě.
+	Na obrázku \ref{pnWork} a obrázku \ref{pnWork2} je znázorněn světle modrou barvou.
+	Generování cestujících začíná vždy se začátkem nového dne a končí s koncem dne.
+	Na konci dne se všichni čekající cestující uvolní ze systému (\cite{SLAJD}, slide 7).
+
+	\begin{figure}[h]
+		\centering
+		\includegraphics[scale=0.7, width=\textwidth]{pn-work2.pdf}
+		\caption{Petriho síť znázorňující nástup/výstup pasažérů a cestu k prvnímu molu}
+		\label{pnWork2}
+	\end{figure}
+	Zde vidíme, že po příjezdu do Podbaby se vytvoří nový proces, který čeká 4 minuty.
+	Po uplynutí této doby se loď vydá zpět na cestu do Podhoří. V tomto čase stihne vyložit
+	cestujícící a naložit nové. Pokud je tato jízda poslední, tak je proces lodi ze systému (\cite{SLAJD}, slide 7) uvolněn.
+	Stejně tak jsou uvolněni i pasažéři, kteří nemohou být naloženi z důvodu noční fáze.
+
+ \newpage
+	\section{Architektura simulačního modelu}
+	V programu jsou implementovány 2 Facility(\cite{SLAJD}, slide 163). Ty reprezentují 2 mola, které umožňují nástup cestujících.
+    Dále jeden prvek typu Store(\cite{SLAJD}, slide 163), který znázoruňuje palubu lodi s určitou kapacitou. V samotném simulačním
+	modelu (\cite{SLAJD}, slide 9) jsou využívány 2 generátory pasažérů rozšiřující třídu Event((\cite{SLAJD}, slide 163)). Ty se starají o generování
+	pasažérů na obou březích. Jelikož v reálném světě přicházejí cestují pouze přes den v pracovní době přívozu,
+	tak je generování pasažérů v hodinách mimo pracovní dobu pozastaveno a na začátku pracovní doby opět spuštěno.
+	Pasažéři jsou dvou typů, rozlišují se ve směru jízdy. Ti jsou implementovány jako třídy, které jsou rozšířené
+	třídou Process(\cite{SLAJD}, slide 163). Při vygenerování pasažéra, je jeho první činnost zjistit, zda je možné využít molo k nástupu
+	do přistavené lodi nebo se postavit do čekací fronty. Celé toto řidí proces času, který znázorňuje
+	dopravní řád přívozu a určuje kdy mohou pasažeři nastupovat či vystupovat.
+
+	\section{Podstata simulačních experimentů a jejich průběh}
+
+	Cílem experimentů je najít vhodný jízdní řád pro přívoz na trase Podbaba - Podhoří v Praze.
+	Ke zjištění této informace je vhodné vytvořit model (\cite{SLAJD}, slide 7),
+	neboť provádění experimentů při ostrém provozu není možné z důvodu platných smluvních
+	podmínek Pražského dopravního podniku, které jsou uzavřeny s každým cestujícím, který
+	si zakoupí jízdenku.
+	\subsection{Postup experimentů}
+  V simulačním modelu jsou možné úpravy u následujících hodnot.
+	\begin{enumerate}
+		\item Určení rychlosti generování pasažérů.
+		\item Počet jízd přívozu
+		\item Kapacitu lodi
+	\end{enumerate}
+
+	Pro vytvoření nejvhodnější frekvence jízd jsme se rozhodli ovlivnit rychlost
+	generování pasažérů, počet jízd za den a kapacitu lodi pro převoz pasažérů mimo
+	sezónu.
+
+	\subsection{Jednotlivé experimenty}
+
+	\subsubsection{Experiment 1}
+
+
+
+
 
 
 	\section{Závěr}
 
+	\newpage
 	\section{Zdroje}
 		\bibliography{documentation}
 
