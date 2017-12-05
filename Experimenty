@@ -41,5 +41,5 @@ Interval mezi cestami přibližně 25minut
 
 
 5
-./ims -t 274 -p 46 -f Experiment5-Season2011\ Max\ usage.out
+./ims -t 91 -p 46 -f Experiment5-Season2011\ Max\ usage.out
 

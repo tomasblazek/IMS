@@ -6,4 +6,4 @@ CMakeLists.txt
 
 ims
 
-output.out
+*.out
