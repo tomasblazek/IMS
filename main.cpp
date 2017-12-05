@@ -260,7 +260,15 @@ class GeneratorOfPassager2 : public Event {
 
 
 void printHelp(){
-    printf("This Is Help!\n");
+    printf("Simulační model - Přívoz Podbaba-Podhoří\n");
+    printf("Použití: ./ims [-r doba_běhu] [-c kapacita] [-s počet_jízd] [-p střední_hodnota] [-f výstupní_soubor] [-h]\n");
+    printf("-h Otevře tuto nápovědu a nic jiného\n");
+    printf("-r Doba běhu simulace v sekundách\n");
+    printf("-c Kapacita lodi\n");
+    printf("-s Počet jízd za jeden pracovní den\n");
+    printf("-p Generování pasažérů v celém systému (pro obě mola dohromady) a zadává se střední hodnota exponenciálního rozdělení\n");
+    printf("-f Jméno výstupního souboru (výchozí hodnota 'output.out')\n");
+
     exit(EXIT_SUCCESS);
 }
 
