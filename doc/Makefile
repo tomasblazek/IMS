@@ -1,16 +1,12 @@
 all: pdf
 
 pdf: documentation.tex
-	latex documentation.tex
+	pdflatex documentation.tex
 	bibtex documentation.aux
-	latex documentation.tex
-	latex documentation.tex
-	dvips documentation.dvi
-	ps2pdf documentation.ps
+	pdflatex documentation.tex
+	pdflatex documentation.tex
 
 	rm documentation.aux
-	rm documentation.dvi
-	rm documentation.ps
 	rm documentation.blg
 	rm documentation.bbl
 	rm documentation.log
@@ -18,8 +14,6 @@ pdf: documentation.tex
 
 clean:
 	rm documentation.aux
-	rm documentation.dvi
-	rm documentation.ps
 	rm documentation.blg
 	rm documentation.bbl
 	rm documentation.log
